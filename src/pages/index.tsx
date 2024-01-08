@@ -14,6 +14,7 @@ function createNodesData() {
         x: 100,
         y: 100,
         properties: {
+          status: '',
         },
       },
     ],
@@ -24,6 +25,7 @@ function createNodesData() {
 export default function App() {
   const refContainer = useRef(document.createElement('div'));
   useEffect(() => {
+    // 初始化全屏画布
     const { innerWidth: width, innerHeight: height } = window;
     const logicflow = new LogicFlow({
       container: refContainer.current,
@@ -33,6 +35,7 @@ export default function App() {
       plugins: [DndPanel, Menu, SelectionSelect, Control, MiniMap],
     });
 
+    // 左侧工具栏 需要重构
     logicflow.extension.dndPanel.setPatternItems([
       {
         label: '选区',
@@ -95,8 +98,13 @@ export default function App() {
     //     );
     //   }
     // });
-
+    // 声明校验规则失败的界面提示
+    logicflow.on("connection:not-allowed",(msg) => {
+      alert(msg.msg);
+    });
+    // 注册节点
     logicflow.register(node1);
+    // 渲染初始化数据 后续调用接口获取
     const nodesData = createNodesData();
     logicflow.render(nodesData);
   }, []);
