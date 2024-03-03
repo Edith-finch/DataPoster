@@ -3,21 +3,59 @@ import { Control, DndPanel, Menu, MiniMap, SelectionSelect } from '@logicflow/ex
 import "@logicflow/core/dist/style/index.css"
 import "@logicflow/extension/lib/style/index.css"
 import { useEffect, useRef } from 'react';
-import node1 from '@/components/node1';
+import csvReader from '@/components/source/csvReader';
+import mysqlAdapter from '@/components/sink/mysqlAdapter';
+import csvTransformer from '@/components/channel/csvTransformer';
 
 
 function createNodesData() {
   const graphData = {
     nodes: [
       {
-        type: 'node1',
+        id: '1',
+        type: 'csvReader',
         x: 100,
         y: 100,
+        text: 'csv读取器',
+        properties: {
+          status: '',
+        },
+      },
+      {
+        id: '2',
+        type: 'csvTransformer',
+        x: 300,
+        y: 100,
+        text: 'csv转换',
+        properties: {
+          status: '',
+        },
+      },
+      {
+        id: '3',
+        type: 'mysqlAdapter',
+        x: 500,
+        y: 100,
+        text: 'MySQL入库',
         properties: {
           status: '',
         },
       },
     ],
+    edges: [
+      {
+        sourceNodeId: "1",
+        targetNodeId: "2",
+        type: "polyline",
+        text: "连线",
+      },
+      {
+        sourceNodeId: "2",
+        targetNodeId: "3",
+        type: "polyline",
+        text: "连线",
+      },
+    ]
   };
   return graphData;
 }
@@ -99,11 +137,13 @@ export default function App() {
     //   }
     // });
     // 声明校验规则失败的界面提示
-    logicflow.on("connection:not-allowed",(msg) => {
+    logicflow.on("connection:not-allowed", (msg) => {
       alert(msg.msg);
     });
-    // 注册节点
-    logicflow.register(node1);
+    // 注册节点(可以提供一个全局变量遍历注入)
+    logicflow.register(csvReader);
+    logicflow.register(mysqlAdapter);
+    logicflow.register(csvTransformer)
     // 渲染初始化数据 后续调用接口获取
     const nodesData = createNodesData();
     logicflow.render(nodesData);

@@ -1,6 +1,7 @@
 import { RectNode, RectNodeModel } from '@logicflow/core';
+import { NodeTextTheme } from '@logicflow/core/types/constant/DefaultTheme';
 
-class Node1Model extends RectNodeModel {
+class CsvTransformerModel extends RectNodeModel {
     getNodeStyle() {
         const style = super.getNodeStyle();
         const properties = this.properties;
@@ -18,12 +19,21 @@ class Node1Model extends RectNodeModel {
         return style;
     }
 
+    getTextStyle(): NodeTextTheme {
+        const style = super.getTextStyle();
+        style.fontSize = 16;
+        style.fill = '#000';
+        return style;
+    }
+
     initNodeData(data: any): void {
         super.initNodeData(data);
+        this.text.draggable = false;
+        this.text.editable = false;
         const rule1 = {
-            message: "节点必须为node1",
+            message: "节点必须为csvReader",
             validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
-                return targetNode.type === 'node1';
+                return sourceNode.type === 'csvReader';
             }
         }
         const rule2 = {
@@ -39,12 +49,36 @@ class Node1Model extends RectNodeModel {
         this.height = 100;
         this.radius = 10;
     }
+
+    getAnchorStyle(anchorInfo: any) {
+        const style = super.getAnchorStyle(anchorInfo);
+        style.fill = "green";
+        return style;
+    }
+
+    getDefaultAnchor() {
+        const { width, height, x, y, id } = this;
+        return [
+            {
+                x: x - width / 2,
+                y,
+                type: "left",
+                id: `${id}_0`,
+            },
+            {
+                x: x + width / 2,
+                y,
+                type: "right",
+                id: `${id}_1`,
+            },
+        ];
+    }
 }
 
-class Node1View extends RectNode { }
+class CsvTansformerView extends RectNode { }
 
 export default {
-    type: 'node1',
-    view: Node1View,
-    model: Node1Model,
+    type: 'csvTransformer',
+    view: CsvTansformerView,
+    model: CsvTransformerModel,
 };
